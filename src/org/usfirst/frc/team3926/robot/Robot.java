@@ -92,7 +92,7 @@ public class Robot extends IterativeRobot {
      * This function is called periodically during autonomous
      */
     public void autonomousPeriodic() {
-
+        autonomousController.runAutonomous(autonomousController.lowBar);
         camera.runCamera();
     }
     ////END autonomousPeriodic()////

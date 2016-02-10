@@ -25,14 +25,14 @@ public class AutonomousController {
     ////END AutonomousController constructor////
 
 
-    private AutonomousFunctions[] lowBar = new AutonomousFunctions[] {
+    public AutonomousFunctions[] lowBar = new AutonomousFunctions[] {
             new AutonomousFunctions("straight", 116),
             new AutonomousFunctions("turnLeft", magicAngleTime), //TODO find this out
             new AutonomousFunctions("straight", 108),
             new AutonomousFunctions("done", 000),
     };
 
-    private AutonomousFunctions[] positionTwo = new AutonomousFunctions[] {
+    public AutonomousFunctions[] positionTwo = new AutonomousFunctions[] {
             new AutonomousFunctions("straight", 116),
             new AutonomousFunctions("turnLeft", ninetyDegreeTime), //TODO find this out
             new AutonomousFunctions("straight", 48),
@@ -41,7 +41,7 @@ public class AutonomousController {
             new AutonomousFunctions("done", 000)
     };
 
-    private AutonomousFunctions[] crowdChoice = new AutonomousFunctions[] {
+    public AutonomousFunctions[] crowdChoice = new AutonomousFunctions[] {
             new AutonomousFunctions("straight", 116),
             new AutonomousFunctions("turnLeft", ninetyDegreeTime),
             new AutonomousFunctions("straight", 108),
@@ -50,7 +50,7 @@ public class AutonomousController {
             new AutonomousFunctions("done", 000)
     };
 
-    private AutonomousFunctions[] four = new AutonomousFunctions[] {
+    public AutonomousFunctions[] four = new AutonomousFunctions[] {
             new AutonomousFunctions("straight", 116),
             new AutonomousFunctions("turnRight", ninetyDegreeTime),
             new AutonomousFunctions("straight", 48),
@@ -59,14 +59,14 @@ public class AutonomousController {
             new AutonomousFunctions("done", 000)
     };
 
-    private AutonomousFunctions[] five = new AutonomousFunctions[] {
+    public AutonomousFunctions[] five = new AutonomousFunctions[] {
             new AutonomousFunctions("striahgt", 116),
             new AutonomousFunctions("turnLeft", magicAngleTime),
             new AutonomousFunctions("straight", 108),
             new AutonomousFunctions("done", 000)
     };
 
-    private AutonomousFunctions[] secretPassage = new AutonomousFunctions[] {
+    public AutonomousFunctions[] secretPassage = new AutonomousFunctions[] {
             //TODO fill this out
     };
 
@@ -79,7 +79,7 @@ public class AutonomousController {
      *
      * @param handling The position in autonomous to run: lowBar, positionTwo, crowdChoice, four, five, secretPassage
      */
-    private void runAutonomous(AutonomousFunctions[] handling) {
+    public void runAutonomous(AutonomousFunctions[] handling) {
         String command = handling[currentIndex].getCommand();
         double commandUnit = handling[currentIndex].getCommandUnit();
 
