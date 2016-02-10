@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
 
 public class DriveFunctions {
-    Joystick LeftStick; //The local Joystick variable
+    Joystick leftStick; //The local Joystick variable
     double leftInput; //Holding variable to allow us to manipulate leftStick's input
     Joystick RightStick;
     double rightInput; //Holding variable to allow us to manipulate the rightStick's input
@@ -12,20 +12,20 @@ public class DriveFunctions {
     RobotDrive driveControl;
 
     public DriveFunctions(Joystick leftStick, Joystick rightStick, RobotDrive driveSystem) {
-        this.LeftStick = leftStick;
+        this.leftStick = leftStick;
         this.RightStick = rightStick;
         driveControl = driveSystem;
     }
 
-    public void masterFunction() {
-        leftInput = LeftStick.getY();
+    public void runDrive() {
+        leftInput = leftStick.getY();
         rightInput = RightStick.getY();
 
         if (RightStick.getRawButton(1)) {
             straightMode();
         }
 
-        if (LeftStick.getRawButton(1)) {
+        if (leftStick.getRawButton(1)) {
             safteyMode();
         }
 

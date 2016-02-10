@@ -16,7 +16,7 @@ public class LimitSwitchControl {
         boolean made;
 
         if (limit.get()) {
-            ++madeCheck;
+            ++madeCheck; //A limit switch is "made" when it is activated
 
             if (madeCheck >= 30) {
                 made = true;

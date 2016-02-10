@@ -5,37 +5,21 @@ package org.usfirst.frc.team3926.robot;
  */
 public class AutonomousFunctions {
 
-    private int eventIndex = 0;
-    private int nextEvent = 0;
     private String command;
-    private int commandUnit;
+    private double commandUnit;
 
-    public AutonomousFunctions(String command, int commandUnit) {
-        //this.eventIndex = eventIndex;
-        //this.nextEvent = nextEvent;
+    public AutonomousFunctions(String command, double commandUnit) {
         this.command = command;
         this.commandUnit = commandUnit;
     }
     ////END AutonomousFunctions constructor////
 
-    public int getEventIndex() {
-        return eventIndex;
-    }
-
-    public int getNextEvent() {
-        return nextEvent;
-    }
-
-    public String getCommand() {
+    public String getCommand() { //Get the command of the selected index in the selected array
         return command;
     }
 
-    public int getCommandUnit() {
+    public double getCommandUnit() { //Get the unit (seconds or feet)
         return commandUnit;
-    }
-
-    public void setEventIndex(int index) {
-        eventIndex = index;
     }
 }
 ////END AutonomousFunctions class////

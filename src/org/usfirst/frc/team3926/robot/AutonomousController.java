@@ -3,100 +3,126 @@ package org.usfirst.frc.team3926.robot;
 
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
-import java.lang.reflect.Array;
+import edu.wpi.first.wpilibj.RobotDrive;
 
 public class AutonomousController {
 
     Encoder distanceEncoder;
-
-    public AutonomousController(Encoder distanceEncoder) {
-        this.distanceEncoder = distanceEncoder;
-    }
-    ////END AutonomousController constructor////
-
+    RobotDrive autonomousSystem;
 
     double autoSpeed = 0; //This stuff is used to control the robot during autonomous
     double autoRotate = 0;
 
     private double deltaTime = 0; //This helps measure the time for rotations
+    private final double ninetyDegreeTime = 10; //In milliseconds //TODO test this
+    private final int magicAngleTime = 10; //Angle to turn to low goal in milliseconds
 
-    /**
-     * THIS TIME IS IN MILISECONDS...MAKE SURE YOU USE MILISECONDS
-     */
-    static double ninetyDegreeTime = 10; //TODO test this
-    static int magicAngleTime = 10; //This is the one angle that rotates us towards the low goal
 
-    //TODO create a handler for which array to use
+    public AutonomousController(Encoder distanceEncoder, RobotDrive driveSystem) {
+        this.distanceEncoder = distanceEncoder;
+        this.autonomousSystem = driveSystem;
+    }
+    ////END AutonomousController constructor////
+
 
     private AutonomousFunctions[] lowBar = new AutonomousFunctions[] {
             new AutonomousFunctions("straight", 116),
-            new AutonomousFunctions("turnLeft", magicAngleTime),
+            new AutonomousFunctions("turnLeft", magicAngleTime), //TODO find this out
             new AutonomousFunctions("straight", 108),
             new AutonomousFunctions("done", 000),
     };
 
     private AutonomousFunctions[] positionTwo = new AutonomousFunctions[] {
-            new AutonomousFunctions("straight", 116)
+            new AutonomousFunctions("straight", 116),
+            new AutonomousFunctions("turnLeft", ninetyDegreeTime), //TODO find this out
+            new AutonomousFunctions("straight", 48),
+            new AutonomousFunctions("turnRight", magicAngleTime - ninetyDegreeTime), //TODO check this
+            new AutonomousFunctions("straight", 108),
+            new AutonomousFunctions("done", 000)
     };
+
+    private AutonomousFunctions[] crowdChoice = new AutonomousFunctions[] {
+            new AutonomousFunctions("straight", 116),
+            new AutonomousFunctions("turnLeft", ninetyDegreeTime),
+            new AutonomousFunctions("straight", 108),
+            new AutonomousFunctions("turnRight", magicAngleTime - ninetyDegreeTime), //TODO check this
+            new AutonomousFunctions("straight", 108),
+            new AutonomousFunctions("done", 000)
+    };
+
+    private AutonomousFunctions[] four = new AutonomousFunctions[] {
+            new AutonomousFunctions("straight", 116),
+            new AutonomousFunctions("turnRight", ninetyDegreeTime),
+            new AutonomousFunctions("straight", 48),
+            new AutonomousFunctions("turnRight", magicAngleTime - ninetyDegreeTime), //TODO check this
+            new AutonomousFunctions("straight", 108),
+            new AutonomousFunctions("done", 000)
+    };
+
+    private AutonomousFunctions[] five = new AutonomousFunctions[] {
+            new AutonomousFunctions("striahgt", 116),
+            new AutonomousFunctions("turnLeft", magicAngleTime),
+            new AutonomousFunctions("straight", 108),
+            new AutonomousFunctions("done", 000)
+    };
+
+    private AutonomousFunctions[] secretPassage = new AutonomousFunctions[] {
+            //TODO fill this out
+    };
+
+    //TODO figure out what to do about the lift thing and the door
 
     int currentIndex = 0;
     ////END variable creation////
 
-    public void autonomousRun() {
-
-        //TODO put in autonomous drive function
-    }
-    ////END autonomousRun()////
-
-    private boolean functionHandler(AutonomousFunctions[] handling) {
-        boolean commandState = false;
+    /**
+     *
+     * @param handling The position in autonomous to run: lowBar, positionTwo, crowdChoice, four, five, secretPassage
+     */
+    private void runAutonomous(AutonomousFunctions[] handling) {
         String command = handling[currentIndex].getCommand();
-        int commandUnit = handling[currentIndex].getCommandUnit();
+        double commandUnit = handling[currentIndex].getCommandUnit();
 
         if (command == "straight") {
             if (distanceEncoder.getDistance() < commandUnit) {
                 autoSpeed = .5;
             } else {
-                distanceEncoder.reset();
-                ++currentIndex;
-                autoRotate = 0; //Set the speed to 0 to prevent the robot from rotating more
-                deltaTime = 0; //Reset deltaTime
+                endCommand();
             }
-        }
-        return commandState = false;
-    }
-    ////END functionHanlder()////
-
-    /**
-     *
-     * @param rotateTime
-     * @param rotateRight
-     */
-    /*public boolean autoRotate(double rotateTime, boolean rotateRight) { //X corresponds to our marking on the board not the axis
-        rotateDone = false;
-
-        if (deltaTime == 0) {
-            deltaTime = System.currentTimeMillis();
-        } else if (System.currentTimeMillis() - deltaTime < rotateTime) {
-            autoRotate = 0.25;
-            if (rotateRight) {
-                autoRotate *= -1;
+        } else if (command == "turnLeft") {
+            if (deltaTime == 0) {
+                deltaTime = System.currentTimeMillis();
+            } else if (System.currentTimeMillis() - deltaTime < commandUnit) {
+                autoRotate = .25; //TODO test if left is positive or negative
+            } else {
+                endCommand();
             }
+        } else if (command == "turnRight") {
+            if (deltaTime == 0) {
+                deltaTime = System.currentTimeMillis();
+            } else if (System.currentTimeMillis() - deltaTime < commandUnit) {
+                autoRotate = -0.25; //TODO test if right is positive or negative
+            } else {
+                endCommand();
+            }
+        } else if (command == "done") {
+            SmartDashboard.putBoolean("Autonomous Done", true);
         } else {
-            distanceEncoder.reset();
-            autoRotate = 0; //Set the speed to 0 to prevent the robot from rotating more
-            deltaTime = 0;
-            rotateDone = true;
+            SmartDashboard.putBoolean("Glitch", true);
         }
 
-        return rotateDone;
-    }*/
-    ////END autoRotate()////
-
-    public void autoDone() {
-        SmartDashboard.putString("Autonomous Status", "Done");;
+        autonomousSystem.mecanumDrive_Polar(autoSpeed, 0, autoRotate);
     }
-    ////END autoDone()////
+    ////END runAutonomous()////
+
+    public void endCommand() {
+        distanceEncoder.reset();
+        ++currentIndex;
+        autoRotate = 0;
+        deltaTime = 0;
+
+        SmartDashboard.putNumber("Current Index", currentIndex + 0.00);
+    }
+    ////END endCommand()////
 }
 ////END AutonomousController class////

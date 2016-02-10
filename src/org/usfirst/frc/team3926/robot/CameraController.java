@@ -19,7 +19,7 @@ public class CameraController {
         frame = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
     }
 
-    public void run() {
+    public void runCamera() {
         NIVision.Rect rect = new NIVision.Rect(200, 250, 100, 100);
 
         NIVision.IMAQdxGrab(session, frame, 1);
