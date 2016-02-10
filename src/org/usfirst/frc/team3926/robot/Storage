@@ -1,0 +1,132 @@
+switch (LowBar) {
+            case 1:
+                if (!eventTriggerOne) {
+                    if (distanceEncoder.getDistance() < 116) {
+                        autoSpeed = 0.5;
+                    } else {
+                        eventTriggerOne = true;
+                    }
+                } else if (!eventTriggerTwo) {
+                    if (!rotateDone) {
+                        autoRotate(magicAngleTime, true);
+                    } else {
+                        eventTriggerTwo = true;
+                    }
+                } else if (!eventTriggerThree) { //108
+                    if (distanceEncoder.getDistance() < 108) {
+                        autoSpeed = 0.5;
+                    } else {
+                        eventTriggerThree = true;
+                    }
+                } else {
+                    autoDone(); //Tell the user that autonomous is done
+                }
+                break;
+
+            case 2:
+                if (!eventTriggerOne) {
+                    if (distanceEncoder.getDistance() < 116) {
+                        autoSpeed = 0.5;
+                    } else {
+                        eventTriggerOne = true;
+                    }
+                } else if (!eventTriggerTwo) {
+                    autoRotate(ninetyDegreeTime, false); //False == left
+                } else if (!eventTriggerThree) {
+                    if (distanceEncoder.getDistance() < 108) {
+                        autoSpeed = 0.5;
+                    } else {
+                        eventTriggerThree = true;
+                    }
+                } else if (!eventTriggerFour) {
+                    autoRotate(magicAngleTime - ninetyDegreeTime, true); //True == right We subtract the ninety time because we have already turned 90 degrees of the turn
+                } else if (!eventTriggerFive) {
+                    if (distanceEncoder.getDistance() < 108) {
+                        autoSpeed = 0.5;
+                    } else {
+                        eventTriggerThree = true;
+                    }
+                } else {
+                    autoDone();
+                }
+                break;
+
+            case 3:
+                if (!eventTriggerOne) {
+                    if (distanceEncoder.getDistance() < 116) {
+                        autoSpeed = 0.5;
+                    } else {
+                        eventTriggerOne = true;
+                    }
+                } else if (!eventTriggerTwo) {
+                    autoRotate(ninetyDegreeTime, false);
+                } else if (!eventTriggerThree) {
+                    if (distanceEncoder.getDistance() < 96) {
+                        autoSpeed = 0.5;
+                    } else {
+                        eventTriggerThree = true;
+                    }
+                } else if (!eventTriggerFour) {
+                    autoRotate(magicAngleTime - ninetyDegreeTime, true);
+                } else if (!eventTriggerFive) {
+                    if (distanceEncoder.getDistance() < 108) {
+                        autoSpeed = 0.5;
+                    } else {
+                        eventTriggerThree = true;
+                    }
+                } else {
+                    autoDone();
+                }
+                break;
+
+            case 4:
+                if (!eventTriggerOne) {
+                    if (distanceEncoder.getDistance() < 116) {
+                        autoSpeed = 0.5;
+                    } else {
+                        eventTriggerOne = true;
+                    }
+                } else if (!eventTriggerTwo) {
+                    autoRotate(ninetyDegreeTime, true);
+                } else if (!eventTriggerThree) {
+                    if (distanceEncoder.getDistance() < 48) {
+                        autoSpeed = 0.5;
+                    } else {
+                        eventTriggerThree = true;
+                    }
+                } else if (!eventTriggerFour) {
+                    autoRotate(magicAngleTime - ninetyDegreeTime, true);
+                } else if (!eventTriggerFive) {
+                    if (distanceEncoder.getDistance() < 108) {
+                        autoSpeed = 0.5;
+                    } else {
+                        eventTriggerThree = true;
+                    }
+                } else {
+                    autoDone();
+                }
+                break;
+
+            case 5:
+                if (!eventTriggerOne) {
+                    if (distanceEncoder.getDistance() < 116) {
+                        autoSpeed = 0.5;
+                    } else {
+                        eventTriggerOne = true;
+                    }
+                } else if (!eventTriggerTwo) {
+                    autoRotate(magicAngleTime, false);
+                } else if (!eventTriggerThree) {
+                    if (distanceEncoder.getDistance() < 108) {
+                        autoSpeed = 0.5;
+                    } else {
+                        eventTriggerThree = true;
+                    }
+                } else {
+                    autoDone();
+                }
+                break;
+            case 6:
+
+                break;
+        }
