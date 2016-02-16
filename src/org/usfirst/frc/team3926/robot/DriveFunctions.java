@@ -26,8 +26,11 @@ public class DriveFunctions {
         }
 
         if (leftStick.getRawButton(1)) {
-            safteyMode();
+            safetyMode();
         }
+
+
+
 
         driveControl.tankDrive(leftInput, rightInput);
     }
@@ -36,8 +39,11 @@ public class DriveFunctions {
         leftInput = rightInput;
     }
 
-    public void safteyMode() {
+    public void safetyMode() {
         leftInput /= 2;
         rightInput /= 2;
     }
+
+
 }
+
