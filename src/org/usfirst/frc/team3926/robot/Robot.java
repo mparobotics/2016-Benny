@@ -8,18 +8,18 @@ import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
 
-public class Robot extends IterativeRobot {
-    CameraController camera; //Allows us to control the camera
 
-    CANTalon talonSRX_FR; //Front Right
+public class Robot extends IterativeRobot {
+	CANTalon talonSRX_FR; //Front Right
     CANTalon talonSRX_FL; //Front Left
     CANTalon talonSRX_BR; //Back Right
     CANTalon talonSRX_BL; //Back Left
     RobotDrive driveSystem; //Controller class for operating TankDrive
     Joystick leftStick; //Joystick object for the left hand
+    double leftInput;
     Joystick rightStick; //Joystick object for the right hand
-    DriveFunctions driveControl;
-
+    double rightInput;
+    
     Joystick XBox; //The joystick for the supplimentary driver
 
     Encoder leftEncoder; //Encoder to help us measure our distance traveled
@@ -29,114 +29,147 @@ public class Robot extends IterativeRobot {
     DigitalInput rollerArmExtended; //Limit switch to stop the roller's arm from over-extending
     CANTalon rollerArm; //Motor to move the roller's arm
     CANTalon roller; //Motor to spin the roller
-
-    DigitalInput wedgeArmLimitMin; //Limit switch to prevent the wedge's arm from trying to go to far back
-    DigitalInput wedgeArmLimitMax; //Limit switch to prevent the wedge's arm from over-extending
+    
+    DigitalInput wedgeArmLimitRetracted; //Limit switch to prevent the wedge's arm from trying to go to far back
+    DigitalInput wedgeArmLimitExtended; //Limit switch to prevent the wedge's arm from over-extending
     CANTalon wedgeArm; //Motor to control the wedge
-
-    LimitSwitchControl wedgeExtendLimit;
-    LimitSwitchControl wedgeRetractLimit;
-    LimitSwitchControl rollerExtendLimit;
-    LimitSwitchControl rollerRetractLimit;
-
-    ArmControl wedgeArmController; //Controller for the wedge arm movement
-    ArmControl rollerArmController; //Controller for the roller arm movment
-
-    AutonomousController autonomousController;
-
-    /**
-     * Initializes the variables we declared above with their physical ID
-     * 	- CAN IDs are set in the roboRIO web interface
-     */
+	
     public void robotInit() {
-        camera = new CameraController();
-
-        talonSRX_BL = new CANTalon(VariableStore.TALON_BACK_LEFT_CAN_ID);
-        talonSRX_FL = new CANTalon(VariableStore.TALON_FRONT_LEFT_CAN_ID);
-        talonSRX_BR = new CANTalon(VariableStore.TALON_BACK_RIGHT_CAN_ID);
-        talonSRX_FR = new CANTalon(VariableStore.TALON_FRONT_RIGHT_CAN_ID);
-        driveSystem = new RobotDrive(talonSRX_BL, talonSRX_FL, talonSRX_BR, talonSRX_BR);
-        leftStick = new Joystick (VariableStore.LEFT_JOYSTICK_ID);
-        rightStick = new Joystick (VariableStore.RIGHT_JOYSTICK_ID);
-        driveControl= new DriveFunctions(leftStick, rightStick, driveSystem);
-
-        XBox = new Joystick(VariableStore.XBOX_JOYSTICK_ID);
-
-        leftEncoder = new Encoder(VariableStore.LEFT_ENCODER_A_DIGITAL_INPUT,
-                VariableStore.LEFT_ENCODER_B_DIGITAL_INPUT, VariableStore.LEFT_ENCODER_INDEX_DIGITAL_INPUT);
-        rightEncoder = new Encoder(VariableStore.RIGHT_ENCODER_A_DIGITAL_INPUT,
-                VariableStore.RIGHT_ENCODER_B_DIGITAL_INPUT, VariableStore.RIGHT_ENCODER_INDEX_DIGITAL_INPUT);
-
-        rollerArmRetracted = new DigitalInput (VariableStore.ROLLER_ARM_RETRACTED_DIGITAL_INPUT);
-        rollerArmExtended = new DigitalInput (VariableStore.ROLLER_ARM_EXTENDED_DIGITAL_INPUT);
-        rollerArm = new CANTalon(VariableStore.TALON_ROLLER_ARM_CAN_ID);
-        roller = new CANTalon(VariableStore.TALON_ROLLER_CAN_ID);
-
-        wedgeArmLimitMin = new DigitalInput(VariableStore.WEDGE_ARM_RETRACTED_DIGITAL_INPUT);
-        wedgeArmLimitMax = new DigitalInput(VariableStore.WEDGE_ARM_EXTENDED_DIGITAL_INPUT);
-        wedgeArm = new CANTalon(VariableStore.TALON_WEDGE_ARM_CAN_ID);
-
-        wedgeExtendLimit = new LimitSwitchControl(wedgeArmLimitMax);
-        wedgeRetractLimit = new LimitSwitchControl(wedgeArmLimitMin);
-        rollerExtendLimit = new LimitSwitchControl(rollerArmExtended);
-        rollerRetractLimit = new LimitSwitchControl(rollerArmRetracted);
-
-        wedgeArmController = new ArmControl(wedgeArm);
-        rollerArmController = new ArmControl(rollerArm);
-
-        autonomousController = new AutonomousController(rightEncoder, driveSystem);
+        
     }
     ////END robotInit()////
-
-    /**
-     * This function is called periodically during autonomous
-     */
-    public void autonomousPeriodic() {
-        autonomousController.runAutonomous(autonomousController.lowBar);
-        camera.runCamera();
+    
+    public void autonomousInit() {
+    	
     }
-    ////END autonomousPeriodic()////
+    ////END autonomousInit()////
 
-    /**
-     * This function is called periodically during operator control
-     */
     public void teleopPeriodic() {
-        boolean wedgeRan;
-
-        driveControl.runDrive(); //Run the main drive control
-
-        if (XBox.getRawButton(1)) { //A button
-            wedgeArmController.runMotor(wedgeExtendLimit.getState(), wedgeRetractLimit.getState(), XBox.getRawAxis(2));
-            wedgeRan = true;
-        } else {
-            wedgeArm.set(0);
-            wedgeRan = false;
-        }
-
-        if (XBox.getRawButton(2) && !wedgeRan) { //B button
-            rollerArmController.runMotor(rollerExtendLimit.getState(), rollerRetractLimit.getState(), XBox.getRawAxis(2));
-        } else {
-            rollerArm.set(0);
-        }
-
-        if (XBox.getRawButton(6)) {
-            roller.set(1);
-        } else {
-            roller.set(0);
-        }
-
-        camera.runCamera(); //Run the camera
+        
     }
-    ////END teleopPeriodic()////
+    ////END teleopPeriodic()////   
+    
+    ////Start DriveFunctions////
+	    public void runDrive() {
+	        leftInput = leftStick.getY();
+	        rightInput = rightStick.getY();
+	
+	        if (rightStick.getRawButton(1)) {
+	            straightMode();
+	        }
+	
+	        if (leftStick.getRawButton(1)) {
+	            safteyMode();
+	        }
+	
+	        driveSystem.tankDrive(leftInput, rightInput);
+	    }
+	    ////END runDrive()////
+	
+	    public void straightMode() {
+	        leftInput = rightInput;
+	    }
+	    ////END strightMode()////
+	
+	    public void safteyMode() {
+	        leftInput /= 2;
+	        rightInput /= 2;
+	    }
+	    ////END safteyMode()////
+	////Stop DriveFunctions////
+	    
+	////Start LimitSwitchControl////
+	    private int rollerArmMin; //The int to store our debounce count
+	    private int rollerArmMax;
+	    private int wedgeArmMin;
+	    private int wedgeArmMax;
+	    
+	    public boolean getState(DigitalInput limit, int madeCheck) {
+	        boolean made;
 
-    /**
-     * This function is called periodically during test mode
-     * We will use this to test individual functions of our robot
-     */
-    public void testPeriodic() {
+	        if (limit.get()) {
+	            ++madeCheck; //A limit switch is "made" when it is activated
 
-    }
-    ////END testPeriodic()////
+	            if (madeCheck >= 30) {
+	                made = true;
+	            } else {
+	                made = false;
+	            }
+	        } else {
+	            made = false;
+	            madeCheck = 0;
+	        }
 
+	        return made;
+	    }
+	    ////END limitState()////
+	////Stop LimitSwitchControl////
+	    
+	////Start ArmControl////
+	    /**
+	     * 
+	     * @param retractLimitState The boolean of the retracted switch for the motor
+	     * @param extendLimitState The boolean of the extended switch for the motor
+	     * @param motor The motor that we are controlling
+	     * @param speed The speed to set that motor to
+	     */
+	    public void runMotor(boolean retractLimitState, boolean extendLimitState, CANTalon motor, double speed) {
+	        if (!retractLimitState && speed < 0) { //It must be less than zero so that it can move away from the limit
+	            motor.set(speed);
+	        } else if (!extendLimitState && speed > 0) {
+	            motor.set(speed);
+	        } else {
+	            motor.set(0);
+	        }
+	    }
+	////Stop ArmControl////
+	    
+	////Start AutonomousController////
+	    private double deltaTime = 0; //This helps measure the time for rotations
+	    private final double ninetyDegreeTime = 10; //In milliseconds //TODO test this
+	    private final int magicAngleTime = 10; //Angle to turn to low goal in milliseconds
+	    
+	    private String convertAction(int action) {
+	    	String actionString = "";
+	    	
+	    	switch(action) {
+	    	case 1:
+	    		actionString = "straight";
+	    		break;
+	    	case 2:
+	    		actionString = "turnLeft";
+	    		break;
+	    	case 3:
+	    		actionString = "turnRight";
+	    		break;
+	    	case 4:
+	    		actionString = "done";
+	    		break;
+	    	default:
+	    		actionString = "broken";
+	    	}
+	    	
+	    	return actionString;
+	    }
+	    
+	    private final int[] lowBarActions = {
+	    		1, 2, 1, 4, //Order of actions
+	    		116, magicAngleTime, 
+	    		
+	    };
+	    
+	    public String lowbarAct(int stage) {
+	    	String action = "";
+	    	
+	    	
+	    	
+	    	return action;
+	    }
+	////Stop AutonomousController////
 }
 ////END Robot class////
+
+
+
+
+
