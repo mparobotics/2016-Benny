@@ -15,6 +15,8 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Timer;
 
+import java.util.LinkedHashMap;
+
 
 public class Robot extends IterativeRobot {
 	
@@ -40,6 +42,10 @@ public class Robot extends IterativeRobot {
     static final int LEFT_JOYSTICK_ID 	= 0;
     static final int RIGHT_JOYSTICK_ID  = 1;
     static final int XBOX_JOYSTICK_ID   = 2;
+
+
+    // Store all the counter debounce counters in a single spot
+    LinkedHashMap<String, Integer> limitSwitchDebounceCounterMap = new LinkedHashMap<>();
 
 	CANTalon talonSRX_FL; //Front Left
 	CANTalon talonSRX_BL; //Back Left
@@ -67,6 +73,12 @@ public class Robot extends IterativeRobot {
     CANTalon wedgeArm; //Motor to control the wedge
 	
     public void robotInit() {
+        // Initialize the debounce hash map
+        limitSwitchDebounceCounterMap.put("wedgeArmMin", 0);
+        limitSwitchDebounceCounterMap.put("wedgeArmMax", 30);
+        limitSwitchDebounceCounterMap.put("rollerArmMin", 0);
+        limitSwitchDebounceCounterMap.put("rollerArmMax", 30);
+
 		talonSRX_FL = new CANTalon(TALON_FRONT_LEFT_CAN_ID);
 		talonSRX_BL = new CANTalon(TALON_BACK_LEFT_CAN_ID);
 		talonSRX_FR = new CANTalon(TALON_FRONT_RIGHT_CAN_ID);
@@ -110,7 +122,7 @@ public class Robot extends IterativeRobot {
         runDrive(); //Run the main drive control
 
         if (xbox.getRawButton(1)) { //A button
-            runMotor(getState(wedgeArmRetracted, wedgeArmMin), getState(wedgeArmRetracted, wedgeArmMin), wedgeArm,
+            runMotor(getState(wedgeArmRetracted, "wedgeArmMin"), getState(wedgeArmRetracted, "wedgeArmMin"), wedgeArm,
                     xbox.getRawAxis(2));
             wedgeRan = true;
         } else {
@@ -119,7 +131,7 @@ public class Robot extends IterativeRobot {
         }
 
         if (xbox.getRawButton(2) && !wedgeRan) { //B button
-            runMotor(getState(rollerArmRetracted, rollerArmMin), getState(rollerArmExtended, rollerArmMax), rollerArm,
+            runMotor(getState(rollerArmRetracted, "rollerArmMin"), getState(rollerArmExtended, "rollerArmMax"), rollerArm,
                     xbox.getRawAxis(2));
         } else {
             rollerArm.set(0);
@@ -164,25 +176,30 @@ public class Robot extends IterativeRobot {
 	////Stop DriveFunctions////
 	    
 	////Start LimitSwitchControl////
-	    private int rollerArmMin; //The int to store our debounce count
-	    private int rollerArmMax;
-	    private int wedgeArmMin;
-	    private int wedgeArmMax;
-	    
-	    public boolean getState(DigitalInput limit, int madeCheck) {
+	    //private int rollerArmMin; //The int to store our debounce count
+	    //private int rollerArmMax;
+	    //private int wedgeArmMin;
+	    //private int wedgeArmMax;
+
+        // XXX What are we doing with madeCheck ?
+	    public boolean getState(DigitalInput limit, String limitSwitchCounter) {
 	        boolean made;
 
 	        if (limit.get()) {
-	            ++madeCheck; //A limit switch is "made" when it is activated
+	            int currentValue = limitSwitchDebounceCounterMap.get(limitSwitchCounter);
+                limitSwitchDebounceCounterMap.replace(limitSwitchCounter, currentValue++);
 
-	            if (madeCheck >= 30) {
+
+                ++currentValue; //A limit switch is "made" when it is activated
+
+	            if (currentValue >= 30) {
 	                made = true;
 	            } else {
 	                made = false;
 	            }
 	        } else {
 	            made = false;
-	            madeCheck = 0;
+                limitSwitchDebounceCounterMap.replace(limitSwitchCounter, 0);
 	        }
 
 	        return made;
@@ -212,7 +229,8 @@ public class Robot extends IterativeRobot {
 	    private double deltaTime = 0; //This helps measure the time for rotations
 	    private final double ninetyDegreeTime = 10; //In milliseconds //TODO test this
 	    private final int magicAngleTime = 10; //Angle to turn to low goal in milliseconds
-	    
+
+        // XXX What are we doing here and with lowBarAct?
 	    private final String[] lowBarActions = {
 	    		"straight", "turnLeft", "straight", "done" //Order of actions
 	    };
