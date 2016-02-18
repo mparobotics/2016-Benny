@@ -176,12 +176,6 @@ public class Robot extends IterativeRobot {
 	////Stop DriveFunctions////
 	    
 	////Start LimitSwitchControl////
-	    //private int rollerArmMin; //The int to store our debounce count
-	    //private int rollerArmMax;
-	    //private int wedgeArmMin;
-	    //private int wedgeArmMax;
-
-        // XXX What are we doing with madeCheck ?
 	    public boolean getState(DigitalInput limit, String limitSwitchCounter) {
 	        boolean made;
 
