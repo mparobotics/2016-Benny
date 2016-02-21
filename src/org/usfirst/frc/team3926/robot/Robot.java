@@ -1,8 +1,14 @@
 
 package org.usfirst.frc.team3926.robot;
 
-import edu.wpi.first.wpilibj.*;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.CANTalon;
+import edu.wpi.first.wpilibj.CameraServer;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.RobotDrive;
+import edu.wpi.first.wpilibj.Timer;
 
 
 public class Robot extends IterativeRobot {
@@ -42,6 +48,10 @@ public class Robot extends IterativeRobot {
     double rightInput;
 
     Joystick xbox; //The joystick for the supplimentary driver
+    private final int XBOX_LEFT_Y_AXIS = 1;
+    private final int XBOX_LEFT_TRIGGER = 2;
+    private final int XBOX_RIGHT_TRIGGER = 3;
+    private final int XBOX_RIGHT_Y = 5;
 
     Encoder leftEncoder; //Encoder to help us measure our distance traveled
     Encoder rightEncoder; //Encoder on the right side
@@ -83,12 +93,12 @@ public class Robot extends IterativeRobot {
 
         rollerArmExtended = new DigitalInput(ROLLER_ARM_EXTENDED_DIGITAL_INPUT);
         rollerArmRetracted = new DigitalInput(ROLLER_ARM_RETRACTED_DIGITAL_INPUT);
-        rollerArm = new CANTalon(TALON_ROLLER_ARM_CAN_ID);
+        rollerArm = new Talon(TALON_ROLLER_ARM_CAN_ID);
         roller = new CANTalon(TALON_ROLLER_CAN_ID);
 
         wedgeArmRetracted = new DigitalInput(WEDGE_ARM_RETRACTED_DIGITAL_INPUT);
         wedgeArmExtended = new DigitalInput(WEDGE_ARM_EXTENDED_DIGITAL_INPUT);
-        wedgeArm = new CANTalon(TALON_WEDGE_ARM_CAN_ID);
+        wedgeArm = new Talon(TALON_WEDGE_ARM_CAN_ID);
 
         server = CameraServer.getInstance();
         server.setQuality(50);
@@ -103,62 +113,34 @@ public class Robot extends IterativeRobot {
         Timer.delay(0.005);
     }
     ////END autonomousPeriodic()////
-
+    
+    public void teleopInit() {
+    	server.startAutomaticCapture("cam0");
+    }
+    ////END teleopInit()////
+    
     public void teleopPeriodic() {
         runDrive(); //Run the main drive control
 
         double rollerInput = xbox.getRawAxis(1);
-        if (rollerInput <= -0.1) { //Left Y
-            rollerArmMin = getState(rollerArmRetracted, rollerArmMin);
+        rollerArmMin = getState(rollerArmRetracted, rollerArmMin);
+        rollerArmMax = getState(rollerArmExtended, rollerArmMax);
 
-            //SmartDashboard.putNumber("Out of function number", rollerArmMin);
-
-            if (rollerArmMin >= 30) {
-                rollerArm.set(((rollerInput * rollerInput) /2) * -1);
-            } else {
-                rollerArm.set(0);
-            }
-        } else if (rollerInput >= .1) { //Left Y
-            rollerArmMax = getState(rollerArmExtended, rollerArmMax);
-
-            if (rollerArmMax >= 30) {
-                rollerArm.set((rollerInput * rollerInput)/2);
-            } else {
-                rollerArm.set(0);
-            }
-        } else {
-            rollerArm.set(0);
-        }
-
-        if (xbox.getRawAxis(2) >= 0.1) { //Left Trigger
-            roller.set(xbox.getRawAxis(2));
-        } else if (xbox.getRawAxis(3) > 0.1 ) { //Right Trigger
-            roller.set(xbox.getRawAxis(3) * -1);
-        } else {
-        	roller.set(0);
-        }
+        double rollerArmSet = (rollerArmMin >= 30) ? ((rollerInput * rollerInput)/2) * -1 : 0;
+        rollerArmSet = (rollerArmMax >= 30) ? (rollerInput * rollerInput)/2 : rollerArmSet;
+        rollerArm.set(rollerArmSet);
+        
+        double rollerSet = (xbox.getRawAxis(2) >= 0.1) ? xbox.getRawAxis(2) : 0;
+        rollerSet = (xbox.getRawAxis(3)>= 0.1) ? xbox.getRawAxis(3) * -1 : rollerSet;
+        roller.set(rollerSet);
 
         double wedgeInput = xbox.getRawAxis(5);
-        if (wedgeInput <= -0.1) { //Right Y
-            wedgeArmMin = getState(wedgeArmRetracted, wedgeArmMin);
-
-            if (wedgeArmMin >= 30) {
-                wedgeArm.set(((wedgeInput * wedgeInput) * -1)/3);
-            } else {
-                wedgeArm.set(0);
-            }
-        } else if (wedgeInput >= 0.1) { //Right Y
-            wedgeArmMax = getState(wedgeArmExtended, wedgeArmMax);
-
-            if (wedgeArmMax >= 30) {
-                wedgeArm.set((wedgeInput * wedgeInput)/3);
-            } else {
-                wedgeArm.set(0);
-            }
-        } else {
-            wedgeArm.set(0);
-        }
-        //TODO move set outside and change variables
+        wedgeArmMin = getState(wedgeArmRetracted, wedgeArmMin);
+        wedgeArmMax = getState(wedgeArmExtended, wedgeArmMax);
+        
+        double wedgeSet = (wedgeArmMin >= 30) ? ((wedgeInput * wedgeInput) * -1)/2 : 0;
+        wedgeSet = (wedgeArmMax >= 30) ? (wedgeInput * wedgeInput)/2 : wedgeSet;
+        wedgeArm.set(wedgeSet);
         
         Timer.delay(0.005);
     }
@@ -168,20 +150,6 @@ public class Robot extends IterativeRobot {
 	    public void runDrive() {
 	        leftInput = leftStick.getY();
 	        rightInput = rightStick.getY();
-
-          /*  if (Math.abs(leftInput) - Math.abs(rightInput) >= correctionNumber) {
-                if (leftInput > 0) {
-                    rightInput = leftInput - correctionNumber;
-                } else {
-                    rightInput = leftInput + correctionNumber;
-                }
-            } else if (Math.abs(rightInput) - Math.abs(leftInput) >= correctionNumber) {
-                if (rightInput > 0) {
-                    leftInput = rightInput - correctionNumber;
-                } else {
-                    leftInput = rightInput + correctionNumber;
-                }
-            } */
 
             if (rightStick.getRawButton(1)) {
                 straightMode();
@@ -217,37 +185,9 @@ public class Robot extends IterativeRobot {
 	            madeCheck = 0;
 	        }
 
-            //SmartDashboard.putNumber("In function number", madeCheck);
-
 	        return madeCheck;
 	    }
 	////Stop LimitSwitchControl////
-
-	////Start ArmControl////
-
-	    /**
-	     *
-	     * @param retractLimitState The boolean of the retracted switch for the motor
-	     * @param extendLimitState The boolean of the extended switch for the motor
-	     * @param motor The motor that we are controlling
-	     * @param speed The speed to set that motor to
-	     */
-        /*
-	    public void runMotor(boolean retractLimitState, boolean extendLimitState, CANTalon motor, double speed) {
-            double motorSpeed = 0;
-
-	        if (!retractLimitState && speed < 0) { //It must be less than zero so that it can move away from the limit
-	            motorSpeed = speed;
-	        } else if (!extendLimitState && speed > 0) {
-	            motorSpeed = speed;
-	        } else {
-	            motorSpeed = 0;
-	        }
-
-            motor.set(motorSpeed);
-	    }
-    */
-	////Stop ArmControl////
 
 /*	////Start AutonomousController////
 	    private double deltaTime = 0; //This helps measure the time for rotations
