@@ -26,3 +26,7 @@ build.properties
 build.xml
 
 bin/org/usfirst/frc/team3926/robot/Robot.class
+
+dist/FRCUserProgram.jar
+
+dist/FRCUserProgram.jar
