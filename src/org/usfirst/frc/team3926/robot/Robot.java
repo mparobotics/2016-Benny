@@ -1,6 +1,11 @@
 
 package org.usfirst.frc.team3926.robot;
 
+import com.ni.vision.NIVision;
+import com.ni.vision.NIVision.DrawMode;
+import com.ni.vision.NIVision.Image;
+import com.ni.vision.NIVision.ShapeMode;
+
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -8,6 +13,7 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
+import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Timer;
 
 
@@ -18,8 +24,9 @@ public class Robot extends IterativeRobot {
     static final int TALON_BACK_RIGHT_CAN_ID 	= 3;
     static final int TALON_FRONT_RIGHT_CAN_ID 	= 4;
     static final int TALON_ROLLER_CAN_ID 		= 5;
-    static final int TALON_ROLLER_ARM_CAN_ID	= 6;
-    static final int TALON_WEDGE_ARM_CAN_ID 	= 7;
+    
+    static final int TALON_WEDGE_ARM_PWM 	= 0;
+    static final int SPARK_ROLLER_ARM_PWM	= 1;
 
     static final int ROLLER_ARM_EXTENDED_DIGITAL_INPUT 	= 0;
     static final int ROLLER_ARM_RETRACTED_DIGITAL_INPUT	= 1;
@@ -51,19 +58,19 @@ public class Robot extends IterativeRobot {
     private final int XBOX_LEFT_Y_AXIS = 1;
     private final int XBOX_LEFT_TRIGGER = 2;
     private final int XBOX_RIGHT_TRIGGER = 3;
-    private final int XBOX_RIGHT_Y = 5;
+    private final int XBOX_RIGHT_Y_AXIS = 5;
 
     Encoder leftEncoder; //Encoder to help us measure our distance traveled
     Encoder rightEncoder; //Encoder on the right side
 
     DigitalInput rollerArmRetracted; //Limit switch to prevent the roller arm from trying to go to far back
     DigitalInput rollerArmExtended; //Limit switch to stop the roller's arm from over-extending
-    CANTalon rollerArm; //Motor to move the roller's arm
+    Talon rollerArm; //Motor to move the roller's arm
     CANTalon roller; //Motor to spin the roller
 
     DigitalInput wedgeArmRetracted; //Limit switch to prevent the wedge's arm from trying to go to far back
     DigitalInput wedgeArmExtended; //Limit switch to prevent the wedge's arm from over-extending
-    CANTalon wedgeArm; //Motor to control the wedge
+    Talon wedgeArm; //Motor to control the wedge
 
     private int rollerArmMin; //The int to store our debounce count
     private int rollerArmMax;
@@ -93,12 +100,12 @@ public class Robot extends IterativeRobot {
 
         rollerArmExtended = new DigitalInput(ROLLER_ARM_EXTENDED_DIGITAL_INPUT);
         rollerArmRetracted = new DigitalInput(ROLLER_ARM_RETRACTED_DIGITAL_INPUT);
-        rollerArm = new Talon(TALON_ROLLER_ARM_CAN_ID);
+        rollerArm = new Talon(SPARK_ROLLER_ARM_PWM);
         roller = new CANTalon(TALON_ROLLER_CAN_ID);
 
         wedgeArmRetracted = new DigitalInput(WEDGE_ARM_RETRACTED_DIGITAL_INPUT);
         wedgeArmExtended = new DigitalInput(WEDGE_ARM_EXTENDED_DIGITAL_INPUT);
-        wedgeArm = new Talon(TALON_WEDGE_ARM_CAN_ID);
+        wedgeArm = new Talon(TALON_WEDGE_ARM_PWM);
 
         server = CameraServer.getInstance();
         server.setQuality(50);
@@ -122,7 +129,7 @@ public class Robot extends IterativeRobot {
     public void teleopPeriodic() {
         runDrive(); //Run the main drive control
 
-        double rollerInput = xbox.getRawAxis(1);
+        double rollerInput = xbox.getRawAxis(XBOX_LEFT_Y_AXIS);
         rollerArmMin = getState(rollerArmRetracted, rollerArmMin);
         rollerArmMax = getState(rollerArmExtended, rollerArmMax);
 
@@ -130,11 +137,11 @@ public class Robot extends IterativeRobot {
         rollerArmSet = (rollerArmMax >= 30) ? (rollerInput * rollerInput)/2 : rollerArmSet;
         rollerArm.set(rollerArmSet);
         
-        double rollerSet = (xbox.getRawAxis(2) >= 0.1) ? xbox.getRawAxis(2) : 0;
-        rollerSet = (xbox.getRawAxis(3)>= 0.1) ? xbox.getRawAxis(3) * -1 : rollerSet;
+        double rollerSet = (xbox.getRawAxis(XBOX_LEFT_TRIGGER) >= 0.1) ? xbox.getRawAxis(2) : 0;
+        rollerSet = (xbox.getRawAxis(XBOX_RIGHT_TRIGGER)>= 0.1) ? xbox.getRawAxis(3) * -1 : rollerSet;
         roller.set(rollerSet);
 
-        double wedgeInput = xbox.getRawAxis(5);
+        double wedgeInput = xbox.getRawAxis(XBOX_RIGHT_Y_AXIS);
         wedgeArmMin = getState(wedgeArmRetracted, wedgeArmMin);
         wedgeArmMax = getState(wedgeArmExtended, wedgeArmMax);
         
@@ -187,43 +194,24 @@ public class Robot extends IterativeRobot {
 
 	        return madeCheck;
 	    }
+	    ////END getState()////
 	////Stop LimitSwitchControl////
-
-/*	////Start AutonomousController////
-	    private double deltaTime = 0; //This helps measure the time for rotations
+	    
+	////Start AutonomousController////
+/*	    private double deltaTime = 0; //This helps measure the time for rotations
 	    private final double ninetyDegreeTime = 10; //In milliseconds //TODO test this
 	    private final int magicAngleTime = 10; //Angle to turn to low goal in milliseconds
+	    
+	    private void autonomousControl(int session) {
+	    	
+	    }
 
 	    private final String[] lowBarActions = {
 	    		"straight", "turnLeft", "straight", "done" //Order of actions
 	    };
 
-
-
-	    public String lowbarAct(int stage) {
-	    	String action = "";
-
-
-
-	    	return action;
-	    }
+	    */
 	////Stop AutonomousController////
-*/
-    ////Start CameraController////
-    //int session;
-    //Image frame;
-
-/*    public void runCamera() {
-        NIVision.Rect rect = new NIVision.Rect(200, 250, 100, 100);
-
-        NIVision.IMAQdxGrab(session, frame, 1);
-        NIVision.imaqDrawShapeOnImage(frame, frame, rect, DrawMode.DRAW_VALUE, ShapeMode.SHAPE_OVAL, 0.0f);
-
-        CameraServer.getInstance().setImage(frame);
-        Timer.delay(0.005);
-    }
-    ////Stop CameraController////
-    */
 }
 ////END Robot class////
 
