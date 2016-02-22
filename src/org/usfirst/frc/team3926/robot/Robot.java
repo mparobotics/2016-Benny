@@ -128,6 +128,14 @@ public class Robot extends IterativeRobot {
     
     public void teleopPeriodic() {
         runDrive(); //Run the main drive control
+        
+        if (leftStick.getRawButton(2)){
+            wedgeArm.set(1);
+        } else wedgeArm.set(0);
+
+        if (rightStick.getRawButton(2)){
+            rollerArm.set(1);
+        } else rollerArm.set(0);
 
         double rollerInput = xbox.getRawAxis(XBOX_LEFT_Y_AXIS);
         rollerArmMin = getState(rollerArmRetracted, rollerArmMin);
