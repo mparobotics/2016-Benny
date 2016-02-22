@@ -128,7 +128,7 @@ public class Robot extends IterativeRobot {
     
     public void teleopPeriodic() {
         runDrive(); //Run the main drive control
-        
+
         if (leftStick.getRawButton(2)){
             wedgeArm.set(1);
         } else wedgeArm.set(0);
@@ -136,12 +136,12 @@ public class Robot extends IterativeRobot {
         if (rightStick.getRawButton(2)){
             rollerArm.set(1);
         } else rollerArm.set(0);
-
+        
         double rollerInput = xbox.getRawAxis(XBOX_LEFT_Y_AXIS);
         rollerArmMin = getState(rollerArmRetracted, rollerArmMin);
         rollerArmMax = getState(rollerArmExtended, rollerArmMax);
 
-        double rollerArmSet = (rollerArmMin >= 30) ? ((rollerInput * rollerInput)/2) * -1 : 0;
+        double rollerArmSet = (rollerArmMin >= 30) ? ((rollerInput * rollerInput)/2) : 0;
         rollerArmSet = (rollerArmMax >= 30) ? (rollerInput * rollerInput)/2 : rollerArmSet;
         rollerArm.set(rollerArmSet);
         
@@ -153,7 +153,7 @@ public class Robot extends IterativeRobot {
         wedgeArmMin = getState(wedgeArmRetracted, wedgeArmMin);
         wedgeArmMax = getState(wedgeArmExtended, wedgeArmMax);
         
-        double wedgeSet = (wedgeArmMin >= 30) ? ((wedgeInput * wedgeInput) * -1)/2 : 0;
+        double wedgeSet = (wedgeArmMin >= 30) ? ((wedgeInput * wedgeInput))/2 : 0;
         wedgeSet = (wedgeArmMax >= 30) ? (wedgeInput * wedgeInput)/2 : wedgeSet;
         wedgeArm.set(wedgeSet);
         
