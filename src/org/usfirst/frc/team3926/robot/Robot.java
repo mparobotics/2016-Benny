@@ -76,6 +76,7 @@ public class Robot extends IterativeRobot {
     private int wedgeArmMin;
     private int wedgeArmMax;
 
+    private int debounceAmount = 30;
    // CameraServer server;
    // int session;
    // Image frame;
@@ -126,6 +127,7 @@ public class Robot extends IterativeRobot {
     ////END autonomousPeriodic()////
     
     public void teleopInit() {
+        motorStop();
     	//server.startAutomaticCapture("cam0");
     }
     ////END teleopInit()////
@@ -138,8 +140,8 @@ public class Robot extends IterativeRobot {
         rollerArmMin = getState(rollerArmRetracted, rollerArmMin);
         rollerArmMax = getState(rollerArmExtended, rollerArmMax);
 
-        double rollerArmSet = (rollerArmMin >= 30) ? ((rollerInput * Math.abs(rollerInput))/2) : 0;
-        rollerArmSet = (rollerArmMax >= 30) ? (rollerInput * Math.abs(rollerInput))/2 : rollerArmSet;
+        double rollerArmSet = (rollerArmMin >= debounceAmount) ? ((rollerInput * Math.abs(rollerInput))/2) : 0;
+        rollerArmSet = (rollerArmMax >= debounceAmount) ? (rollerInput * Math.abs(rollerInput))/2 : rollerArmSet;
         rollerArm.set(rollerArmSet);
         
         double rollerSet = (xbox.getRawAxis(XBOX_LEFT_TRIGGER) >= 0.1) ? xbox.getRawAxis(2) : 0;
@@ -150,8 +152,8 @@ public class Robot extends IterativeRobot {
         wedgeArmMin = getState(wedgeArmRetracted, wedgeArmMin);
         wedgeArmMax = getState(wedgeArmExtended, wedgeArmMax);
         
-        double wedgeSet = (wedgeArmMin >= 30) ? ((wedgeInput * Math.abs(wedgeInput)))/2 : 0;
-        wedgeSet = (wedgeArmMax >= 30) ? (wedgeInput * Math.abs(wedgeInput))/2 : wedgeSet;
+        double wedgeSet = (wedgeArmMin >= debounceAmount) ? ((wedgeInput * Math.abs(wedgeInput)))/2 : 0;
+        wedgeSet = (wedgeArmMax >= debounceAmount) ? (wedgeInput * Math.abs(wedgeInput))/2 : wedgeSet;
         wedgeArm.set(wedgeSet);
         
         Timer.delay(0.005);
@@ -201,7 +203,17 @@ public class Robot extends IterativeRobot {
 	    }
 	    ////END getState()////
 	////Stop LimitSwitchControl////
-	    
+	public void motorStop(){
+        driveSystem.tankDrive(0,0);
+        roller.set(0);
+        rollerArm.set(0);
+        wedgeArm.set(0);
+        leftEncoder.reset();
+        rightEncoder.reset();
+    }
+
+
+
 	////Start AutonomousController////
 	    private double deltaTime = 0; //This helps measure the time for rotations
 	    private final double ninetyDegreeTime = 10; //In milliseconds //TODO test this
@@ -215,11 +227,12 @@ public class Robot extends IterativeRobot {
 	    		"straight", "turnLeft", "straight", "done" //Order of actions
 	    };
 
-	    */
+
+
 	////Stop AutonomousController////
 	    
 	////Start CameraDebug////
-	    public void runCamera() {
+	  /*  public void runCamera() {
 	    	NIVision.Rect rect = new NIVision.Rect(200, 250, 100, 100);
 	    	 
 	    	NIVision.IMAQdxGrab(session, frame, 1);
@@ -227,7 +240,7 @@ public class Robot extends IterativeRobot {
 	    	 
 	    	CameraServer.getInstance().setImage(frame);
 	    	Timer.delay(0.005);
-	   }
+	   } */
 	////Stop CameraDebug////
 }
 ////END Robot class////
