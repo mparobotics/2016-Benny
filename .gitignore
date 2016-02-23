@@ -1,5 +1,6 @@
 
 .DS_Store
+<<<<<<< HEAD
 
 .idea/.name
 
@@ -20,3 +21,14 @@
 .idea/workspace.xml
 
 2016-Benny.iml
+=======
+.idea/*
+*.class
+*.iml
+*.jar
+
+
+build.properties
+
+build.xml
+>>>>>>> Single-File-Benny
