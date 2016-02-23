@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.Timer;
 
 
 public class Robot extends IterativeRobot {
-
+// Added comment for the thing
 	static final int TALON_BACK_LEFT_CAN_ID 	= 1;
     static final int TALON_FRONT_LEFT_CAN_ID	= 2;
     static final int TALON_BACK_RIGHT_CAN_ID 	= 3;
