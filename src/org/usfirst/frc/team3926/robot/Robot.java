@@ -18,13 +18,14 @@ import edu.wpi.first.wpilibj.Timer;
 
 
 public class Robot extends IterativeRobot {
+
 	static final int TALON_BACK_LEFT_CAN_ID 	= 1;
     static final int TALON_FRONT_LEFT_CAN_ID	= 2;
     static final int TALON_BACK_RIGHT_CAN_ID 	= 3;
     static final int TALON_FRONT_RIGHT_CAN_ID 	= 4;
     static final int TALON_ROLLER_CAN_ID 		= 5;
     
-    static final int TALON_WEDGE_ARM_PWM 	= 0;
+    static final int SPARK_WEDGE_ARM_PWM 	= 0;
     static final int SPARK_ROLLER_ARM_PWM	= 1;
 
     static final int ROLLER_ARM_EXTENDED_DIGITAL_INPUT 	= 0;
@@ -76,7 +77,9 @@ public class Robot extends IterativeRobot {
     private int wedgeArmMin;
     private int wedgeArmMax;
 
-    CameraServer server;
+   // CameraServer server;
+   // int session;
+   // Image frame;
 
     //private double correctionNumber = .2;
 
@@ -85,7 +88,7 @@ public class Robot extends IterativeRobot {
 		talonSRX_BL = new CANTalon(TALON_BACK_LEFT_CAN_ID);
 		talonSRX_FR = new CANTalon(TALON_FRONT_RIGHT_CAN_ID);
 		talonSRX_BR = new CANTalon(TALON_BACK_RIGHT_CAN_ID);
-		driveSystem = new RobotDrive(talonSRX_FL, talonSRX_BL, talonSRX_FR, talonSRX_BR);
+		driveSystem = new RobotDrive(talonSRX_FR, talonSRX_BR, talonSRX_FL, talonSRX_BL);
 
         leftStick = new Joystick(LEFT_JOYSTICK_ID);
         rightStick = new Joystick(RIGHT_JOYSTICK_ID);
@@ -106,9 +109,12 @@ public class Robot extends IterativeRobot {
         wedgeArmExtended = new DigitalInput(WEDGE_ARM_EXTENDED_DIGITAL_INPUT);
         wedgeArm = new Talon(TALON_WEDGE_ARM_PWM);
 
-        server = CameraServer.getInstance();
-        server.setQuality(50);
-        server.startAutomaticCapture("cam0");
+       // frame = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
+
+        // the camera name (ex "cam0") can be found through the roborio web interface
+    /*    session = NIVision.IMAQdxOpenCamera("cam0",
+                NIVision.IMAQdxCameraControlMode.CameraControlModeController);
+        NIVision.IMAQdxConfigureGrab(session);*/
        // server.startAutomaticCapture("cam1");
     }
     ////END robotInit()////
@@ -121,27 +127,20 @@ public class Robot extends IterativeRobot {
     ////END autonomousPeriodic()////
     
     public void teleopInit() {
-    	server.startAutomaticCapture("cam0");
+    	//server.startAutomaticCapture("cam0");
     }
     ////END teleopInit()////
     
     public void teleopPeriodic() {
         runDrive(); //Run the main drive control
-
-        if (leftStick.getRawButton(2)){
-            wedgeArm.set(1);
-        } else wedgeArm.set(0);
-
-        if (rightStick.getRawButton(2)){
-            rollerArm.set(1);
-        } else rollerArm.set(0);
+        //runCamera();
         
         double rollerInput = xbox.getRawAxis(XBOX_LEFT_Y_AXIS);
         rollerArmMin = getState(rollerArmRetracted, rollerArmMin);
         rollerArmMax = getState(rollerArmExtended, rollerArmMax);
 
-        double rollerArmSet = (rollerArmMin >= 30) ? ((rollerInput * rollerInput)/2) : 0;
-        rollerArmSet = (rollerArmMax >= 30) ? (rollerInput * rollerInput)/2 : rollerArmSet;
+        double rollerArmSet = (rollerArmMin >= 30) ? ((rollerInput * Math.abs(rollerInput))/2) : 0;
+        rollerArmSet = (rollerArmMax >= 30) ? (rollerInput * Math.abs(rollerInput))/2 : rollerArmSet;
         rollerArm.set(rollerArmSet);
         
         double rollerSet = (xbox.getRawAxis(XBOX_LEFT_TRIGGER) >= 0.1) ? xbox.getRawAxis(2) : 0;
@@ -152,8 +151,8 @@ public class Robot extends IterativeRobot {
         wedgeArmMin = getState(wedgeArmRetracted, wedgeArmMin);
         wedgeArmMax = getState(wedgeArmExtended, wedgeArmMax);
         
-        double wedgeSet = (wedgeArmMin >= 30) ? ((wedgeInput * wedgeInput))/2 : 0;
-        wedgeSet = (wedgeArmMax >= 30) ? (wedgeInput * wedgeInput)/2 : wedgeSet;
+        double wedgeSet = (wedgeArmMin >= 30) ? ((wedgeInput * Math.abs(wedgeInput)))/2 : 0;
+        wedgeSet = (wedgeArmMax >= 30) ? (wedgeInput * Math.abs(wedgeInput))/2 : wedgeSet;
         wedgeArm.set(wedgeSet);
         
         Timer.delay(0.005);
@@ -162,8 +161,8 @@ public class Robot extends IterativeRobot {
 
     ////Start DriveFunctions////
 	    public void runDrive() {
-	        leftInput = leftStick.getY();
-	        rightInput = rightStick.getY();
+	        leftInput = leftStick.getY() * -1;
+	        rightInput = rightStick.getY() * -1;
 
             if (rightStick.getRawButton(1)) {
                 straightMode();
@@ -205,7 +204,7 @@ public class Robot extends IterativeRobot {
 	////Stop LimitSwitchControl////
 	    
 	////Start AutonomousController////
-/*	    private double deltaTime = 0; //This helps measure the time for rotations
+	    private double deltaTime = 0; //This helps measure the time for rotations
 	    private final double ninetyDegreeTime = 10; //In milliseconds //TODO test this
 	    private final int magicAngleTime = 10; //Angle to turn to low goal in milliseconds
 	    
@@ -219,6 +218,18 @@ public class Robot extends IterativeRobot {
 
 	    */
 	////Stop AutonomousController////
+	    
+	////Start CameraDebug////
+	    public void runCamera() {
+	    	NIVision.Rect rect = new NIVision.Rect(200, 250, 100, 100);
+	    	 
+	    	NIVision.IMAQdxGrab(session, frame, 1);
+	    	NIVision.imaqDrawShapeOnImage(frame, frame, rect, DrawMode.DRAW_VALUE, ShapeMode.SHAPE_OVAL, 0.0f);
+	    	 
+	    	CameraServer.getInstance().setImage(frame);
+	    	Timer.delay(0.005);
+	   }
+	////Stop CameraDebug////
 }
 ////END Robot class////
 
