@@ -1,12 +1,7 @@
 
 package org.usfirst.frc.team3926.robot;
 
-import com.ni.vision.NIVision;
-import com.ni.vision.NIVision.DrawMode;
-import com.ni.vision.NIVision.ShapeMode;
-
 import edu.wpi.first.wpilibj.CANTalon;
-import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.IterativeRobot;
@@ -22,10 +17,10 @@ public class Robot extends IterativeRobot {
     static final int TALON_FRONT_LEFT_CAN_ID	= 2;
     static final int TALON_BACK_RIGHT_CAN_ID 	= 3;
     static final int TALON_FRONT_RIGHT_CAN_ID 	= 4;
-    static final int TALON_ROLLER_CAN_ID 		= 5;
-    
-    static final int SPARK_WEDGE_ARM_PWM = 0;
-    static final int SPARK_ROLLER_ARM_PWM	= 1;
+
+    static final int SPARK_WEDGE_ARM_PWM  = 0;
+    static final int SPARK_ROLLER_ARM_PWM = 1;
+    static final int TALON_ROLLER_PWM_ID  = 2;
 
     static final int ROLLER_ARM_EXTENDED_DIGITAL_INPUT 	= 0;
     static final int ROLLER_ARM_RETRACTED_DIGITAL_INPUT	= 1;
@@ -103,7 +98,7 @@ public class Robot extends IterativeRobot {
         rollerArmExtended = new DigitalInput(ROLLER_ARM_EXTENDED_DIGITAL_INPUT);
         rollerArmRetracted = new DigitalInput(ROLLER_ARM_RETRACTED_DIGITAL_INPUT);
         rollerArm = new Talon(SPARK_ROLLER_ARM_PWM);
-        roller = new Talon(TALON_ROLLER_CAN_ID);
+        roller = new Talon(TALON_ROLLER_PWM_ID);
 
         wedgeArmRetracted = new DigitalInput(WEDGE_ARM_RETRACTED_DIGITAL_INPUT);
         wedgeArmExtended = new DigitalInput(WEDGE_ARM_EXTENDED_DIGITAL_INPUT);
