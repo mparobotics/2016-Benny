@@ -65,7 +65,7 @@ public class Robot extends IterativeRobot {
     DigitalInput rollerArmRetracted; //Limit switch to prevent the roller arm from trying to go to far back
     DigitalInput rollerArmExtended; //Limit switch to stop the roller's arm from over-extending
     Talon rollerArm; //Motor to move the roller's arm
-    CANTalon roller; //Motor to spin the roller
+    Talon roller; //Motor to spin the roller
 
     DigitalInput wedgeArmRetracted; //Limit switch to prevent the wedge's arm from trying to go to far back
     DigitalInput wedgeArmExtended; //Limit switch to prevent the wedge's arm from over-extending
@@ -103,7 +103,7 @@ public class Robot extends IterativeRobot {
         rollerArmExtended = new DigitalInput(ROLLER_ARM_EXTENDED_DIGITAL_INPUT);
         rollerArmRetracted = new DigitalInput(ROLLER_ARM_RETRACTED_DIGITAL_INPUT);
         rollerArm = new Talon(SPARK_ROLLER_ARM_PWM);
-        roller = new CANTalon(TALON_ROLLER_CAN_ID);
+        roller = new Talon(TALON_ROLLER_CAN_ID);
 
         wedgeArmRetracted = new DigitalInput(WEDGE_ARM_RETRACTED_DIGITAL_INPUT);
         wedgeArmExtended = new DigitalInput(WEDGE_ARM_EXTENDED_DIGITAL_INPUT);
