@@ -1,27 +1,19 @@
 
 package org.usfirst.frc.team3926.robot;
 
-import edu.wpi.first.wpilibj.CANTalon;
-import edu.wpi.first.wpilibj.CameraServer;
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.RobotDrive;
-import edu.wpi.first.wpilibj.Talon;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.*;
 
 
 public class Robot extends IterativeRobot {
 
-	static final int TALON_BACK_LEFT_CAN_ID 	= 1;
-    static final int TALON_FRONT_LEFT_CAN_ID	= 2;
-    static final int TALON_BACK_RIGHT_CAN_ID 	= 3;
-    static final int TALON_FRONT_RIGHT_CAN_ID 	= 4;
-    static final int TALON_ROLLER_CAN_ID 		= 5;
+	static final int TALON_BACK_LEFT_CAN_ID   = 1;
+    static final int TALON_FRONT_LEFT_CAN_ID  = 2;
+    static final int TALON_BACK_RIGHT_CAN_ID  = 3;
+    static final int TALON_FRONT_RIGHT_CAN_ID = 4;
+    static final int TALON_ROLLER_CAN_ID 	  = 5;
     
-    static final int SPARK_WEDGE_ARM_PWM 	= 0;
-    static final int SPARK_ROLLER_ARM_PWM	= 1;
+    static final int SPARK_WEDGE_ARM_PWM  = 0;
+    static final int SPARK_ROLLER_ARM_PWM = 1;
 
     static final int ROLLER_ARM_EXTENDED_DIGITAL_INPUT 	= 0;
     static final int ROLLER_ARM_RETRACTED_DIGITAL_INPUT	= 1;
@@ -44,36 +36,38 @@ public class Robot extends IterativeRobot {
     CANTalon talonSRX_BR; //Back Right
     RobotDrive driveSystem; //Controller class for operating TankDrive
 
-    Joystick leftStick; //Joystick object for the left hand
-    double leftInput;
+    Joystick leftStick;  //Joystick object for the left hand
+    double leftInput;    //Double so that we can manipulate speed on the left stick
     Joystick rightStick; //Joystick object for the right hand
-    double rightInput;
+    double rightInput;   //Double so that we can manipulate speed on the right stick
 
-    Joystick xbox; //The joystick for the supplimentary driver
+    Joystick xbox; //The joystick for the helmsman
     private final int XBOX_LEFT_Y_AXIS = 1;
     private final int XBOX_LEFT_TRIGGER = 2;
     private final int XBOX_RIGHT_TRIGGER = 3;
     private final int XBOX_RIGHT_Y_AXIS = 5;
 
     //Encoder leftEncoder; //Encoder to help us measure our distance traveled (not being used)
-   // Encoder rightEncoder; //Encoder on the right side(not being used)
+    //Encoder rightEncoder; //Encoder on the right side(not being used)
 
     DigitalInput rollerArmRetracted; //Limit switch to prevent the roller arm from trying to go to far back
-    DigitalInput rollerArmExtended; //Limit switch to stop the roller's arm from over-extending
+    DigitalInput rollerArmExtended;  //Limit switch to stop the roller's arm from over-extending
     Talon rollerArm; //Motor to move the roller's arm
     CANTalon roller; //Motor to spin the roller
 
     DigitalInput wedgeArmRetracted; //Limit switch to prevent the wedge's arm from trying to go to far back
-    DigitalInput wedgeArmExtended; //Limit switch to prevent the wedge's arm from over-extending
+    DigitalInput wedgeArmExtended;  //Limit switch to prevent the wedge's arm from over-extending
     Talon wedgeArm; //Motor to control the wedge
 
     private int rollerArmMin; //The int to store our debounce count
     private int rollerArmMax;
     private int wedgeArmMin;
     private int wedgeArmMax;
-    double deltaTime = 0;
-    boolean stopSystem = false;
-    CameraServer server;
+
+    double deltaTime = 0;       //Autonomous time controller
+    boolean stopSystem = false; //Boolean to tell if we have finished our task
+
+    CameraServer server; //Server to controll cameras
 
     public void robotInit() { //Code that runs when the robot starts, only runs once
 		talonSRX_FL = new CANTalon(TALON_FRONT_LEFT_CAN_ID); //Motor controllers
