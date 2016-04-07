@@ -71,7 +71,8 @@ public class Robot extends IterativeRobot {
     private int rollerArmMax;
     private int wedgeArmMin;
     private int wedgeArmMax;
-
+    double deltaTime = 0;
+    boolean stopSystem = false;
     CameraServer server;
 
     public void robotInit() { //Code that runs when the robot starts, only runs once
@@ -104,8 +105,7 @@ public class Robot extends IterativeRobot {
         server.setQuality(50);
         server.startAutomaticCapture("cam0");
 
-        double deltaTime = 0;
-        boolean stopSystem = false;
+
     }
     ////END robotInit()////
 
