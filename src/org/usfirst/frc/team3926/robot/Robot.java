@@ -27,12 +27,12 @@ public class Robot extends IterativeRobot {
     static final int ROLLER_ARM_RETRACTED_DIGITAL_INPUT	= 1;
     static final int WEDGE_ARM_EXTENDED_DIGITAL_INPUT 	= 2;
     static final int WEDGE_ARM_RETRACTED_DIGITAL_INPUT	= 3;
-    static final int LEFT_ENCODER_A_DIGITAL_INPUT 		= 4;
+    /*static final int LEFT_ENCODER_A_DIGITAL_INPUT 	= 4;
     static final int LEFT_ENCODER_B_DIGITAL_INPUT 		= 5;
     static final int LEFT_ENCODER_INDEX_DIGITAL_INPUT	= 6;
     static final int RIGHT_ENCODER_A_DIGITAL_INPUT 		= 7;
     static final int RIGHT_ENCODER_B_DIGITAL_INPUT 		= 8;
-    static final int RIGHT_ENCODER_INDEX_DIGITAL_INPUT 	= 9;
+    static final int RIGHT_ENCODER_INDEX_DIGITAL_INPUT 	= 9;*/
 
     static final int LEFT_JOYSTICK_ID 	= 0;
     static final int RIGHT_JOYSTICK_ID  = 1;
@@ -55,8 +55,8 @@ public class Robot extends IterativeRobot {
     private final int XBOX_RIGHT_TRIGGER = 3;
     private final int XBOX_RIGHT_Y_AXIS = 5;
 
-    Encoder leftEncoder; //Encoder to help us measure our distance traveled
-    Encoder rightEncoder; //Encoder on the right side
+    //Encoder leftEncoder; //Encoder to help us measure our distance traveled (not being used)
+   // Encoder rightEncoder; //Encoder on the right side(not being used)
 
     DigitalInput rollerArmRetracted; //Limit switch to prevent the roller arm from trying to go to far back
     DigitalInput rollerArmExtended; //Limit switch to stop the roller's arm from over-extending
@@ -74,33 +74,33 @@ public class Robot extends IterativeRobot {
 
     CameraServer server;
 
-    public void robotInit() {
-		talonSRX_FL = new CANTalon(TALON_FRONT_LEFT_CAN_ID);
+    public void robotInit() { //Code that runs when the robot starts, only runs once
+		talonSRX_FL = new CANTalon(TALON_FRONT_LEFT_CAN_ID); //Motor controllers
 		talonSRX_BL = new CANTalon(TALON_BACK_LEFT_CAN_ID);
 		talonSRX_FR = new CANTalon(TALON_FRONT_RIGHT_CAN_ID);
 		talonSRX_BR = new CANTalon(TALON_BACK_RIGHT_CAN_ID);
-		driveSystem = new RobotDrive(talonSRX_FR, talonSRX_BR, talonSRX_FL, talonSRX_BL);
+		driveSystem = new RobotDrive(talonSRX_FR, talonSRX_BR, talonSRX_FL, talonSRX_BL); //Drive system, using tank drive this year
 
-        leftStick = new Joystick(LEFT_JOYSTICK_ID);
+        leftStick = new Joystick(LEFT_JOYSTICK_ID); //Joysticks
         rightStick = new Joystick(RIGHT_JOYSTICK_ID);
 
-        xbox = new Joystick(XBOX_JOYSTICK_ID);
-
-        leftEncoder = new Encoder(LEFT_ENCODER_A_DIGITAL_INPUT, LEFT_ENCODER_B_DIGITAL_INPUT,
+        xbox = new Joystick(XBOX_JOYSTICK_ID); //XBOX controller
+                //Encoders, not currently being used
+        /*leftEncoder = new Encoder(LEFT_ENCODER_A_DIGITAL_INPUT, LEFT_ENCODER_B_DIGITAL_INPUT,
                 LEFT_ENCODER_INDEX_DIGITAL_INPUT);
         rightEncoder = new Encoder(RIGHT_ENCODER_A_DIGITAL_INPUT, RIGHT_ENCODER_B_DIGITAL_INPUT,
-                RIGHT_ENCODER_INDEX_DIGITAL_INPUT);
+                RIGHT_ENCODER_INDEX_DIGITAL_INPUT);*/
 
-        rollerArmExtended = new DigitalInput(ROLLER_ARM_EXTENDED_DIGITAL_INPUT);
+        rollerArmExtended = new DigitalInput(ROLLER_ARM_EXTENDED_DIGITAL_INPUT); //Roller arm = top bar with rollers
         rollerArmRetracted = new DigitalInput(ROLLER_ARM_RETRACTED_DIGITAL_INPUT);
         rollerArm = new Talon(SPARK_ROLLER_ARM_PWM);
         roller = new CANTalon(TALON_ROLLER_CAN_ID);
 
-        wedgeArmRetracted = new DigitalInput(WEDGE_ARM_RETRACTED_DIGITAL_INPUT);
+        wedgeArmRetracted = new DigitalInput(WEDGE_ARM_RETRACTED_DIGITAL_INPUT); //Wedge arm = bottom arm to scoop ball
         wedgeArmExtended = new DigitalInput(WEDGE_ARM_EXTENDED_DIGITAL_INPUT);
         wedgeArm = new Talon(SPARK_WEDGE_ARM_PWM);
 
-        server = CameraServer.getInstance();
+        server = CameraServer.getInstance(); //Camera server, camera located directly below arms
         server.setQuality(50);
         server.startAutomaticCapture("cam0");
     }
@@ -126,11 +126,11 @@ public class Robot extends IterativeRobot {
         double rollerInput = xbox.getRawAxis(XBOX_LEFT_Y_AXIS);
         rollerArmMin = getState(rollerArmRetracted, rollerArmMin);
         rollerArmMax = getState(rollerArmExtended, rollerArmMax);
-
+        //Setting speed of the roller arm, half the value of the input
         double rollerArmSet = (rollerArmMin >= 30) ? ((rollerInput * Math.abs(rollerInput))/2) : 0;
         rollerArmSet = (rollerArmMax >= 30) ? (rollerInput * Math.abs(rollerInput))/2 : rollerArmSet;
         rollerArm.set(rollerArmSet);
-        
+        //Setting the speed of the rollers to bring the ball in
         double rollerSet = (xbox.getRawAxis(XBOX_LEFT_TRIGGER) >= 0.1) ? xbox.getRawAxis(2) : 0;
         rollerSet = (xbox.getRawAxis(XBOX_RIGHT_TRIGGER)>= 0.1) ? xbox.getRawAxis(3) * -1 : rollerSet;
         roller.set(rollerSet);
@@ -138,7 +138,7 @@ public class Robot extends IterativeRobot {
         double wedgeInput = xbox.getRawAxis(XBOX_RIGHT_Y_AXIS);
         wedgeArmMin = getState(wedgeArmRetracted, wedgeArmMin);
         wedgeArmMax = getState(wedgeArmExtended, wedgeArmMax);
-        
+        //Setting the speed of the wedge arm -- half of input wasn't enough power, so its 60% power
         double wedgeSet = (wedgeArmMin >= 30) ? (wedgeInput*0.6) : 0;
         wedgeSet = (wedgeArmMax >= 30) ? (wedgeInput*0.6) : wedgeSet;
         wedgeArm.set(wedgeSet);
@@ -148,8 +148,8 @@ public class Robot extends IterativeRobot {
     ////END teleopPeriodic()////
 
     ////Start DriveFunctions////
-	    public void runDrive() {
-	        leftInput = leftStick.getY() * -1;
+	    public void runDrive() { //main drive function
+	        leftInput = leftStick.getY() * -1; //inputs inverted to counteract the inversion of the joysticks
 	        rightInput = rightStick.getY() * -1;
 
             if (rightStick.getRawButton(1)) {
@@ -160,20 +160,20 @@ public class Robot extends IterativeRobot {
                 safteyMode();
             }
 
-	        driveSystem.tankDrive(leftInput, rightInput);
+	        driveSystem.tankDrive(leftInput, rightInput); //Drive system, using tank drive
 	    }
 	    ////END runDrive()////
 
 	    public void straightMode() {
 	        leftInput = rightInput;
-	    }
+	    } //sets both motors to same strength to move straight
 	    ////END straightMode()////
 
-	    public void safteyMode() {
+	    public void safteyMode() { //cuts power to motors in half for precision driving
 	        leftInput /= 2;
 	        rightInput /= 2;
 	    }
-	    ////END safteyMode()////
+	    ////END safety Mode()////
 
 	////Stop DriveFunctions////
 
