@@ -103,6 +103,9 @@ public class Robot extends IterativeRobot {
         server = CameraServer.getInstance(); //Camera server, camera located directly below arms
         server.setQuality(50);
         server.startAutomaticCapture("cam0");
+
+        double deltaTime = 0;
+        boolean stopSystem = false;
     }
     ////END robotInit()////
 
