@@ -106,10 +106,20 @@ public class Robot extends IterativeRobot {
     }
     ////END robotInit()////
 
-    double deltaTime = System.currentTimeMillis();
+    public void autonomousInit() {
+        deltaTime = System.currentTimeMillis(); //Establish start time for autonomous
+    }
+    ////END autonomousInit()////
     
     public void autonomousPeriodic() {
-    	if (deltaTime < 4000)
+    	if (System.currentTimeMillis() - deltaTime < 4000) { //If less than 4 seconds have passed
+            driveSystem.tankDrive(1, 1); //Drive at full speed forward
+        } else if (!stopSystem) { //If the system has not been stopped
+            driveSystem.tankDrive(0, 0); //Stop the drive
+            stopSystem = true; //Say that we have stopped the drive
+        } else {
+            //No Else
+        }
     	
         Timer.delay(0.005);
     }
